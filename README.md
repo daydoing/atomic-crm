@@ -102,3 +102,13 @@ Atomic CRM components are published as a Shadcn Registry file:
 ## License
 
 This project is licensed under the MIT License, courtesy of [Marmelab](https://marmelab.com). See the [LICENSE.md](./LICENSE.md) file for details.
+
+
+备注
+1. 安装部署到vercel到时候前端一直连接不到数据库，vercel读取不到env，我把vite.config.ts中判断production的代码删了，还添加了.env,.env_production.local 都是线上环境
+
+2. 前端部署以后连接到数据库创建用户一直401失败，然后在https://supabase.com/ 的Edge Functions-> 点击进去的details中的Verify JWT with legacy secret关闭
+
+3. Auth中的email 没有配置使用的默认的
+
+4. 编译到dist以后 前端部署 vercel --prod 选择已有的crm这个项目进行更新
