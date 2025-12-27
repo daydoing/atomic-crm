@@ -611,7 +611,6 @@ from
     left join public.tasks t on co.id = t.contact_id
     left join public.companies c on co.company_id = c.id
     join public.sales s on s.id = co.sales_id
-where s.user_id = auth.uid()
 group by
     co.id,
     c.name;
