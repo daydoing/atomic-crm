@@ -566,35 +566,52 @@ CREATE POLICY "Attachments 1mt4rzk_3" ON storage.objects FOR DELETE TO authentic
 create view "public"."companies_summary"
     with (security_invoker=on)
     as
-select 
+select
     c.*,
     count(distinct d.id) as nb_deals,
     count(distinct co.id) as nb_contacts
-from 
+from
     "public"."companies" c
-left join 
+left join
     "public"."deals" d on c.id = d.company_id
-left join 
+left join
     "public"."contacts" co on c.id = co.company_id
-group by 
+group by
     c.id;
-    
+
 -- Use Postgres to create views for contacts.
 
-create view "public"."contacts_summary"
-    with (security_invoker=on)
-    as
-select 
-    co.*,
+create or replace view public.contacts_summary
+    with (security_invoker = on)
+as
+select
+    co.id,
+    co.first_name,
+    co.last_name,
+    co.gender,
+    co.title,
+    co.email_jsonb,
+    jsonb_path_query_array(co.email_jsonb, '$[*]."email"'::jsonpath)::text as email_fts,
+    co.phone_jsonb,
+    jsonb_path_query_array(co.phone_jsonb, '$[*]."number"'::jsonpath)::text as phone_fts,
+    co.background,
+    co.avatar,
+    co.first_seen,
+    co.last_seen,
+    co.has_newsletter,
+    co.status,
+    co.tags,
+    co.company_id,
+    co.sales_id,
+    co.linkedin_url,
     c.name as company_name,
     count(distinct t.id) as nb_tasks
 from
-    "public"."contacts" co
-left join
-    "public"."tasks" t on co.id = t.contact_id
-left join
-    "public"."companies" c on co.company_id = c.id
+    public.contacts co
+    left join public.tasks t on co.id = t.contact_id
+    left join public.companies c on co.company_id = c.id
+    join public.sales s on s.id = co.sales_id
+where s.user_id = auth.uid()
 group by
-    co.id, c.name;
-
-
+    co.id,
+    c.name;
