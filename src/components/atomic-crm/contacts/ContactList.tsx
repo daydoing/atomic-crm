@@ -1,4 +1,5 @@
 import jsonExport from "jsonexport/dist";
+import { useMemo } from "react";
 import {
   downloadCSV,
   useGetIdentity,
@@ -22,6 +23,11 @@ import { TopToolbar } from "../layout/TopToolbar";
 export const ContactList = () => {
   const { identity } = useGetIdentity();
 
+  const baseFilter = useMemo(() => {
+    if (!identity || identity.administrator) return undefined;
+    return { sales_id: identity.id };
+  }, [identity]);
+
   if (!identity) return null;
 
   return (
@@ -31,6 +37,7 @@ export const ContactList = () => {
       perPage={25}
       sort={{ field: "last_seen", order: "DESC" }}
       exporter={exporter}
+      filter={baseFilter}
     >
       <ContactListLayout />
     </List>
